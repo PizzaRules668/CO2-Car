@@ -1,7 +1,33 @@
 #include <HX711.h> // https://github.com/bogde/HX711
+#include <Servo.h>
 
 #define HX711_DT  8 // HX711 Data Pin
 #define HX711_SCK 9 // HX711 Clock Pin
+
+#define IGNITION_IN  2    // Input pin for the ignition button
+#define IGNITION_LED 4    // LED for ignition
+#define IGNITION_LEN 1500 // How long you have to hold the ignition button
+#define IGNITION_SERVO 5  // Pin for ignition servo
+#define IGNITION_DEG 30   // Angle for ignition servo to move to
+
+#define SAFE_LED 3 // Led for end game
+
+Servo ignitionServo;
+
+int ignitionState = 0;
+
+unsigned long ignitionTime;
+unsigned long endTime;
+float ignitionDuration;
+
+float force;
+
+int count = 0;
+int state = 0;
+// States
+// 0 Pre Ignition  - Waiting for button to be held
+// 1 Ignition      - Waiting for force to be < 0
+// 2 Post Ignition - Thrust has stopped, waiting to be reset
 
 HX711 loadcell;
 
@@ -30,7 +56,79 @@ void calibrate()
 
 void loop()
 {
-    // Get Value, and print it
-    Serial.print(loadcell.get_units(10));
-    Serial.print(", "); // Print , so it can go into csv format
+    if (state == 0)
+    {
+        // Pre ignition - Waiting for button to be held
+        ignitionState = digitalRead(IGNITION_IN); // Read button state
+
+        if (ignitionState == HIGH) // If Button is Pressed
+        {
+            count += 1; // Increment counter
+            delay(1);
+
+            digitalWrite(SAFE_LED, LOW);   // Turn off safe LED
+            digitalWrite(IGNITION_LED, LOW); // Turn off fire LED
+        } else { // If not pressed
+            count = 0; // Reset Counter
+
+            digitalWrite(SAFE_LED, LOW);   // Turn off safe LED
+            digitalWrite(IGNITION_LED, LOW); // Turn off fire LED
+        }
+
+        if (count == IGNITION_LEN)
+        {
+            state = 1; // Set state to Ignition State
+            count = 0; // Reset Counter
+
+            ignitionTime = millis(); // Record End Time
+            digitalWrite(IGNITION_LED, HIGH); // Turn on fire LED
+            ignitionServo.write(IGNITION_DEG); // Move servo to ignition degree
+
+            Serial.println("IGNITION");
+        }
+    } else if (state == 1) {
+        // 1 Ignition - Waiting for force to be < 0
+
+        // Get Value
+        force = loadcell.get_units(10);
+
+        // Print force it
+        Serial.print(force);
+        Serial.print(", "); // Print , so it can go into csv format
+
+        if (force < 0)
+        {
+            endTime = millis(); // Record End Time
+
+            state = 2; // Set State to Post Launch
+
+            Serial.println("Car Passed by");
+            digitalWrite(IGNITION_LED, LOW); // Turn off Launch LED
+            digitalWrite(SAFE_LED, HIGH);  // Turn on Safe LED
+
+            ignitionDuration = (endTime - launchTime) / 1000.0; // How long did it travel for in seconds
+
+            Serial.println("\nForce is less than 0");
+
+            Serial.print("Took ");
+            Serial.print(ignitionDuration);
+            Serial.println("s");
+        }
+    } else if (state == 2) {
+        // 2 Post Ignition - Thrust has stopped, waiting to be reset
+
+        if (digitalRead(LAUNCH_IN) == HIGH) // If button is pressed
+        {
+            state = 0; // Set state to Pre Launched State
+            
+            digitalWrite(SAFE_LED, LOW);   // Turn off Launch LED
+            digitalWrite(LAUNCH_LED, LOW); // Turn off Safe LED
+            launchServo.write(0);          // Move servo pre launch pos
+
+            Serial.println("Reset");
+            delay(500); // For safety wait .5 seconds
+            Serial.println()
+        }
+    }
+
 }

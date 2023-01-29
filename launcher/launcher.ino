@@ -129,7 +129,7 @@ void loop()
 
             Serial.println("Reset");
             delay(500); // For safety wait .5 seconds
-            Serial.println("\n\n");
+            Serial.println()
         }
     }
 }
