@@ -1,15 +1,20 @@
+#include <Servo.h>
 
-#define LAUNCH_IN  2    // input pin for the launch button
-#define LAUNCH_LED 4    // led for launching
-#define LAUNCH_LEN 1500 // how long you have to hold the launch button
+#define LAUNCH_IN  2    // Input pin for the launch button
+#define LAUNCH_LED 4    // LED for launching
+#define LAUNCH_LEN 1500 // How long you have to hold the launch button
+#define LAUNCH_SERVO 5  // Pin for launch servo
+#define LAUNCH_DEG 30   // Angle for launch servo to move to
 
-#define TRIG_PIN  7  // trigger pin for the ending sensor
-#define PING_PIN  6  // ping pin for the ending sensor
-#define PASS_DIST 10 // distance need to trigger the end
+#define TRIG_PIN  7  // Trigger pin for the ending sensor
+#define PING_PIN  6  // Ping pin for the ending sensor
+#define PASS_DIST 10 // Distance need to trigger the end
 
-#define SAFE_LED 3 // led for end game
+#define SAFE_LED 3 // Led for end game
 
 #define TRACK_LEN 20 // Track lenght in meters
+
+Servo launchServo;
 
 int launchState = 0;
 
@@ -30,6 +35,9 @@ void setup()
 {
     Serial.begin(9600);
     Serial.println("Start");
+
+    launchServo.attach(LAUNCH_SERVO);
+    launchServo.write(0);
 
     pinMode(LAUNCH_IN,  INPUT);
     pinMode(LAUNCH_LED, OUTPUT);
@@ -69,6 +77,7 @@ void loop()
 
             launchTime = millis(); // Record End Time
             digitalWrite(LAUNCH_LED, HIGH); // Turn on fire LED
+            launchServo.write(LAUNCH_DEG); // Move servo to launch degree
 
             Serial.println("Launch");
         }
@@ -100,8 +109,8 @@ void loop()
             launchDuration = (endTime - launchTime) / 1000.0; // How long did it travel for in seconds
 
             Serial.print("Took ");
-            Serial.print(duration);
-            Serial.println("ms");
+            Serial.print(launchDuration);
+            Serial.println("s");
 
             Serial.print("It went and Average of ");
             Serial.print(TRACK_LEN / (launchDuration));
@@ -116,9 +125,11 @@ void loop()
             
             digitalWrite(SAFE_LED, LOW);   // Turn off Launch LED
             digitalWrite(LAUNCH_LED, LOW); // Turn off Safe LED
+            launchServo.write(0);          // Move servo pre launch pos
 
             Serial.println("Reset");
             delay(500); // For safety wait .5 seconds
+            Serial.println("\n\n");
         }
     }
 }
