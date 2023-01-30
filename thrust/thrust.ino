@@ -100,13 +100,13 @@ void loop()
         {
             endTime = millis(); // Record End Time
 
-            state = 2; // Set State to Post Launch
+            state = 2; // Set State to Post Ignition
 
             Serial.println("Car Passed by");
-            digitalWrite(IGNITION_LED, LOW); // Turn off Launch LED
+            digitalWrite(IGNITION_LED, LOW); // Turn off Ignition LED
             digitalWrite(SAFE_LED, HIGH);  // Turn on Safe LED
 
-            ignitionDuration = (endTime - launchTime) / 1000.0; // How long did it travel for in seconds
+            ignitionDuration = (endTime - ignitionTime) / 1000.0; // How long did it travel for in seconds
 
             Serial.println("\nForce is less than 0");
 
@@ -117,18 +117,17 @@ void loop()
     } else if (state == 2) {
         // 2 Post Ignition - Thrust has stopped, waiting to be reset
 
-        if (digitalRead(LAUNCH_IN) == HIGH) // If button is pressed
+        if (digitalRead(IGNITION_IN) == HIGH) // If button is pressed
         {
-            state = 0; // Set state to Pre Launched State
+            state = 0; // Set state to Pre ignition State
             
             digitalWrite(SAFE_LED, LOW);   // Turn off Launch LED
-            digitalWrite(LAUNCH_LED, LOW); // Turn off Safe LED
-            launchServo.write(0);          // Move servo pre launch pos
+            digitalWrite(IGNITION_LED, LOW); // Turn off Safe LED
+            ignitionServo.write(0);        // Move servo pre ignition pos
 
             Serial.println("Reset");
             delay(500); // For safety wait .5 seconds
-            Serial.println()
+            Serial.println();
         }
     }
-
 }
