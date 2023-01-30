@@ -93,8 +93,10 @@ void loop()
         force = loadcell.get_units(10);
 
         // Print force it
-        Serial.print(force);
+        Serial.print(force); // Print current force
         Serial.print(", "); // Print , so it can go into csv format
+        Serial.print(millis - ignitionTime) // Print Current time 
+        Serial.println(", "); // Print , so it can go into csv format
 
         if (force < 0)
         {
