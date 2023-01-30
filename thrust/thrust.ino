@@ -39,6 +39,9 @@ void setup()
     loadcell.begin(HX711_DT, HX711_SCK); // Init HX711 on pins
     loadcell.tare(); // Reset to 0
 
+    ignitionServo.attach(IGNITION_SERVO);
+    ignitionServo.write(0);
+
     calibrate();
 }
 
