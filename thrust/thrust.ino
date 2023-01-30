@@ -38,19 +38,29 @@ void setup()
 
     loadcell.begin(HX711_DT, HX711_SCK); // Init HX711 on pins
     loadcell.tare(); // Reset to 0
+
+    calibrate();
 }
 
 void calibrate()
 {
+    Serial.println("Calibrating");
+
     loadcell.set_scale();
     loadcell.tare();
 
     Serial.print("Weight: ");
 
+    while (Serial.available() == 0) {}
+
     float knownWeight = Serial.parseFloat();
     float weight = loadcell.get_units(10);
 
     float scale = weight / knownWeight;
+    
+    Serial.print("\nScale is ");
+    Serial.println(scale);
+
     loadcell.set_scale(scale);
 }
 
@@ -95,7 +105,7 @@ void loop()
         // Print force it
         Serial.print(force); // Print current force
         Serial.print(", "); // Print , so it can go into csv format
-        Serial.print(millis - ignitionTime) // Print Current time 
+        Serial.print(millis() - ignitionTime); // Print Current time 
         Serial.println(", "); // Print , so it can go into csv format
 
         if (force < 0)
@@ -104,13 +114,11 @@ void loop()
 
             state = 2; // Set State to Post Ignition
 
-            Serial.println("Car Passed by");
+            Serial.println("Thrust has stopped");
             digitalWrite(IGNITION_LED, LOW); // Turn off Ignition LED
             digitalWrite(SAFE_LED, HIGH);  // Turn on Safe LED
 
             ignitionDuration = (endTime - ignitionTime) / 1000.0; // How long did it travel for in seconds
-
-            Serial.println("\nForce is less than 0");
 
             Serial.print("Took ");
             Serial.print(ignitionDuration);
