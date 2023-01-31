@@ -10,7 +10,7 @@
 #define IGNITION_SERVO 5  // Pin for ignition servo
 #define IGNITION_DEG 30   // Angle for ignition servo to move to
 
-#define SAFE_LED 3 // Led for end game
+#define SAFE_LED 3 // LED to say when safe
 
 Servo ignitionServo;
 
@@ -33,7 +33,7 @@ HX711 loadcell;
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(57600);
     Serial.println("Start");
 
     loadcell.begin(HX711_DT, HX711_SCK); // Init HX711 on pins
@@ -52,7 +52,8 @@ void calibrate()
     loadcell.set_scale();
     loadcell.tare();
 
-    Serial.print("Weight: ");
+    Serial.println("Place Weight");
+    Serial.print("What is the Weight of the object: ");
 
     while (Serial.available() == 0) {}
 
@@ -103,7 +104,7 @@ void loop()
         // 1 Ignition - Waiting for force to be < 0
 
         // Get Value
-        force = loadcell.get_units(10);
+        force = loadcell.get_units(2);
 
         // Print force it
         Serial.print(force); // Print current force
