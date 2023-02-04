@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import pandas as pd
 import serial
+import os
 
 # thrust.py
 # 
@@ -69,6 +70,9 @@ def computeData():
     plt.savefig(fileName+".png")
 
 if __name__ == "__main__":
+    if not os.path.exists("thrustData/"):
+        os.makedirs("thrustData/")
+
     print("Serial Connection Open")
     while True:
         try:            
