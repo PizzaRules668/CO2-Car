@@ -53,7 +53,7 @@ void calibrate()
     loadcell.tare();
 
     Serial.println("Place Weight");
-    Serial.print("What is the Weight of the object: ");
+    Serial.println("What is the Weight of the object: ");
 
     while (Serial.available() == 0) {}
 
@@ -104,13 +104,12 @@ void loop()
         // 1 Ignition - Waiting for force to be < 0
 
         // Get Value
-        force = loadcell.get_units(2);
+        force = loadcell.get_units(1);
 
         // Print force it
         Serial.print(millis() - ignitionTime); // Print Current time
         Serial.print(", "); // Print , so it can go into csv format
-        Serial.print(force); // Print current force
-        Serial.println(", "); // Print , so it can go into csv format
+        Serial.println(force); // Print current force
 
         if (force < 0)
         {
