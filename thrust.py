@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     print("Serial Connection Open")
     while True:
-        try:            
+        try:
             if conn.in_waiting:
                 data = conn.readline().decode()
                 print(data, end="")
