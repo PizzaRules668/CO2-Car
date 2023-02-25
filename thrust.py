@@ -13,11 +13,11 @@ import os
 # 
 
 baud = 57600
-device = "/dev/ttyACM0"
+device = "/dev/ttyACM1"
 
 conn = serial.Serial(port=device, baudrate=baud)
 
-objWeight = 0
+objWeight = 20.2
 carMass = 49.5 # Cars Weight in grams
 thrusting = False
 thrustData = []
@@ -67,6 +67,7 @@ def computeData():
     print(f"Peak Thrust {data.loc[:, 'Force(newtons)'].idxmax()} newtons")
 
     plt.plot(data.index, data["Force(grams)"])
+    plt.show()
     plt.savefig(fileName+".png")
 
 if __name__ == "__main__":
@@ -81,7 +82,8 @@ if __name__ == "__main__":
                 print(data, end="")
 
                 if "What is the Weight of the object:" in data:
-                    objWeight = input()
+                    print(objWeight)
+                    #objWeight = input()
                     conn.write(str(objWeight).encode("utf"))
 
                 elif "IGNITION" in data:
