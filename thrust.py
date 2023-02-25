@@ -67,7 +67,7 @@ def computeData():
     print(f"Peak Thrust {data.loc[:, 'Force(newtons)'].idxmax()} newtons")
 
     plt.plot(data.index, data["Force(grams)"])
-    plt.show()
+    #plt.show()
     plt.savefig(fileName+".png")
 
 if __name__ == "__main__":
