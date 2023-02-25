@@ -8,7 +8,7 @@
 #define IGNITION_LED 4    // LED for ignition
 #define IGNITION_LEN 1500 // How long you have to hold the ignition button
 #define IGNITION_SERVO 5  // Pin for ignition servo
-#define IGNITION_DEG 30   // Angle for ignition servo to move to
+#define IGNITION_DEG 45   // Angle for ignition servo to move to
 
 #define SAFE_LED 3 // LED to say when safe
 
@@ -111,7 +111,7 @@ void loop()
         Serial.print(", "); // Print , so it can go into csv format
         Serial.println(force); // Print current force
 
-        if (force < 0)
+        if (force < -1)
         {
             endTime = millis(); // Record End Time
 
