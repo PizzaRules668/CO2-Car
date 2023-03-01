@@ -50,8 +50,8 @@ def computeData():
             print(tData)
             print(e)
 
-    data = data.sort_index(ascending=False)
     data = data.set_index("Time")
+    data = data.sort_index(ascending=False)
 
     print(data)
     fileName = datetime.now().strftime(fileFormat)
