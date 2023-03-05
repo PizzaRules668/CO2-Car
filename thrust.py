@@ -29,6 +29,30 @@ KG2N = 9.8066500286389
 # month-day-24hr-min-thrust.csv
 fileFormat = "thrustData/%m-%Y-%H-%M-thrust"
 
+def plot(df, filename):
+    fig, ax = plt.subplots(1, 3)
+    fig.suptitle("Thrust Data")
+
+    ax[0].set_title("Position vs Time")
+    ax[0].set_xlabel("Millisecond")
+    ax[0].set_ylabel("Meter")
+    ax[0].plot(df.index, df["Position"])
+    
+    ax[1].set_title("Velocity vs Time")
+    ax[1].set_xlabel("Millisecond")
+    ax[1].set_ylabel("m/s")
+    ax[1].plot(df.index, df["Velocity"])
+    ax[1].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+    ax[2].plot(df.index, df["Acceleration"])
+    ax[2].set_xlabel("Millisecond")
+    ax[2].set_ylabel("m/s/s")
+    ax[2].set_title("Acceleration vs Time")
+
+
+    plt.savefig(fileName)
+
+
 def computeData():
     print("Computing Data")
 
@@ -70,9 +94,7 @@ def computeData():
     print(f"Peak Thrust {data.loc[:, 'Force(kilograms)'].idxmax()} kilograms")
     print(f"Peak Thrust {data.loc[:, 'Force(newtons)'].idxmax()} newtons")
 
-    plt.plot(data.index, data["Force(grams)"])
-    #plt.show()
-    plt.savefig(fileName+".png")
+    plot(df, fileName+".png")
 
 if __name__ == "__main__":
     if not os.path.exists("thrustData/"):
