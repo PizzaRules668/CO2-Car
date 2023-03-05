@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 from datetime import datetime
 import pandas as pd
+import numpy as np
+import scipy
 import serial
 import os
 
@@ -22,28 +24,27 @@ carMass = 49.5 # Cars Weight in grams
 thrusting = False
 thrustData = []
 
+KG2N = 9.8066500286389
+
 # month-day-24hr-min-thrust.csv
 fileFormat = "thrustData/%m-%Y-%H-%M-thrust"
 
 def computeData():
     print("Computing Data")
 
-    data = pd.DataFrame(columns=["Time", "Force(grams)", "Force(kilograms)", "Force(newtons)", "Acceleration", "Velocity"])
+    data = pd.DataFrame(columns=["Time", "Force(grams)", "Force(kilograms)", "Force(newtons)", "Acceleration"])
 
-    lastVelocity = 0
     for tData in thrustData:
         try:
             time, forceG = tData.split(", ")
             time, forceG = int(time), float(forceG)
         
             forceK = forceG/1000
-            forceN = forceK*9.81
+            forceN = forceK*KG2N
 
             acceleration = forceN/(carMass/1000)
-            velocity = lastVelocity+acceleration
-            lastVelocity = velocity
 
-            data.loc[-1] = [time, forceG, forceK, forceN, acceleration, velocity]
+            data.loc[-1] = [time, forceG, forceK, forceN, acceleration]
             data.index = data.index + 1
             data = data.sort_index()
         except Exception as e:
@@ -52,6 +53,9 @@ def computeData():
 
     data = data.set_index("Time")
     data = data.sort_index(ascending=False)
+
+    data["Velocity"] = np.concatenate(([0.0], scipy.integrate.cumtrapz(data["Acceleration"])))
+    data["Position"] = np.concatenate(([0.0], scipy.integrate.cumtrapz(data["Velocity"])))
 
     print(data)
     fileName = datetime.now().strftime(fileFormat)
