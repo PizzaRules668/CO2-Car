@@ -1,3 +1,4 @@
+from matplotlib.ticker import FormatStrFormatter
 import matplotlib.pyplot as plt
 from datetime import datetime
 import pandas as pd
@@ -15,7 +16,7 @@ import os
 # 
 
 baud = 57600
-device = "/dev/ttyACM1"
+device = "/dev/ttyACM0"
 
 conn = serial.Serial(port=device, baudrate=baud)
 
@@ -50,7 +51,7 @@ def plot(df, filename):
     ax[2].set_title("Acceleration vs Time")
 
 
-    plt.savefig(fileName)
+    plt.savefig(filename)
 
 
 def computeData():
@@ -94,7 +95,7 @@ def computeData():
     print(f"Peak Thrust {data.loc[:, 'Force(kilograms)'].idxmax()} kilograms")
     print(f"Peak Thrust {data.loc[:, 'Force(newtons)'].idxmax()} newtons")
 
-    plot(df, fileName+".png")
+    plot(data, fileName+".png")
 
 if __name__ == "__main__":
     if not os.path.exists("thrustData/"):
